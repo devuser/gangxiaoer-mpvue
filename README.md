@@ -41,6 +41,10 @@ npm run build --report
 
 服务端使用`golang`基于`PaaS`模式开发，暂时不满足公开条件。
 
+![arch.png](./docs/arch.png)
+
+_看不到下图的同学可以看上图_
+
 ```mermaid
 graph TB
 id1(Golang API) --> Redis
@@ -56,6 +60,10 @@ flyio-->id1(Golang API)
 3. 启动 `Docker` 环境中`node.js`运行`npm run dev` 监听编辑器中更新的`*.js` `*.vue`
 4. 启动`Docker`环境中运行的`Golang API` 比如`go run main.go`，做好随时重启的准备或者做好热更新
 5. 打开微信开发工具，打开您正在进行中的微信小程序项目
+
+![env.png](./docs/env.png)
+
+_看不到下图的同学可以看上图_
 
 ```mermaid
   graph TB
