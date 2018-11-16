@@ -5,6 +5,7 @@ const request = new Fly()
 
 // 配置请求基地址
 const host = 'https://coms.boyosoft.net/gangxiaoer/gapi/v2'
+request.config.timeout = 10 * 1000
 request.config.baseURL = host
 
 // request.config.baseURL = 'http://127.0.0.1:39090/boyocoms/gangxiaoer/gapi/v2'
@@ -151,7 +152,7 @@ const getMyselfAddrList = (token) => {
   })
 }
 
-const getPostList = (token, postcategoryId, pageindex, pagelen) => {
+const getPostList = (token, postCategoryId, pageindex, pagelen) => {
   let serverPath = request.config.baseURL
   return new Promise((resolve, reject) => {
     // 拼接完整的url
@@ -161,7 +162,7 @@ const getPostList = (token, postcategoryId, pageindex, pagelen) => {
       url: url,
       data: {
         'token': token,
-        'postcategoryId': postcategoryId,
+        'postCategoryId': postCategoryId,
         'pageindex': pageindex,
         'pagelen': pagelen
       },
@@ -236,6 +237,15 @@ async function getTagList (token, tagType, pageIndex, pageLen) {
   console.log('tagList.data.length: ' + tagList.data.length)
   return tagList
 }
+
+const hitShare = (token, shareToken) => {
+  this.$post('/post/share/hit', {
+    'token': token,
+    'shareToken': shareToken
+  }).then((res) => {
+    console.log(res)
+  })
+}
 //
 export {
   request,
@@ -248,5 +258,6 @@ export {
   getMySelfPrivateData,
   getPostList,
   getMyselfAddrList,
-  doSignIn
+  doSignIn,
+  hitShare
 }

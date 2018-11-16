@@ -3,17 +3,18 @@
 <template>
   <div>
     <label>{{userbref.nickname}}</label>
+    <label>{{userbref.title}}</label>
     <label>{{userbref.membergrade}}</label>
     <label>{{userbref.mobile}}</label>
-    <label>{{userbref.title}}</label>
 
-    <label>{{userbref.mainActivityArea}}</label>
+
+    <!-- <label>{{userbref.mainActivityArea}}</label>
     <label>{{userbref.ActiveGrade}}</label>
     <label>{{userbref.UserGrade}}</label>
     <label>{{userbref.MemberGrade}}</label>
     <label>{{userbref.PaidupMember}}</label>
     <label>{{ValidateStartAt}}</label>
-    <label>{{ValidateOverAt}}</label>
+    <label>{{ValidateOverAt}}</label> -->
 </div>
 
 </template>
@@ -35,8 +36,13 @@ export default {
   methods: {
     onViewPostDetail (postId) {
       console.log(postId)
+      let param = {
+        channel: 'wxappShare',
+        shareToken: '',
+        postId: postId
+      }
       wx.navigateTo({
-        url: '/pages/viewPost/main?postId=' + postId
+        url: '/pages/viewPost/main?rq=' + encodeURIComponent(JSON.stringify(param))
       })
     },
     async onHandActionPost (postId, handAction) {

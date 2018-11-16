@@ -9,7 +9,9 @@ const store = new Vuex.Store({
   state: {
     mydata: {
       content: '',
-      orderSeq: 0
+      orderSeq: '',
+      history: [],
+      steps: []
     }
   },
   mutations: {

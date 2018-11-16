@@ -133,7 +133,7 @@
                     </van-row>
                     <van-row>
                         <van-col>
-                            Email
+                            Email:
                         </van-col>
                         <van-col>
                             {{base.email}}

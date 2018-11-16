@@ -10,10 +10,19 @@ const store = new Vuex.Store({
     userInfo: {
       avatarUrl: ''
     },
+    cityName: '全国',
     count: 0,
-    active: 0,
+    keyword: '',
+    // 如下数据实际上是当前活动tab的所有数据
+    activeTabIndex: 0,
+    currentCategoryId: 1,
     postList: [],
-    currentCategoryId: 1
+    // 总页数
+    pagecount: 10,
+    // 每页条数
+    pagelen: 10,
+    // 当前页码
+    pageindex: 1
   },
   mutations: {
     increment: (state) => {
@@ -28,9 +37,16 @@ const store = new Vuex.Store({
       const obj = state
       obj.active = active
     },
-    updatePostList: (state, newPostList) => {
+    updatePostList: (state, newPostList, pageindex, pagecount, pagelen) => {
       const obj = state
       obj.postList = newPostList
+      obj.pageindex = pageindex
+      obj.pagecount = pagecount
+      obj.pagelen = pagelen
+    },
+    updateactiveTabIndex: (state, newValue) => {
+      const obj = state
+      obj.activeTabId = newValue
     },
     updateCurrentCategoryId: (state, newCategoryId) => {
       const obj = state
@@ -39,6 +55,10 @@ const store = new Vuex.Store({
     updateUserInfo: (state, newValue) => {
       const obj = state
       obj.userInfo = newValue
+    },
+    updateKeyword: (state, newValue) => {
+      const obj = state
+      obj.keyword = newValue
     }
   }
 })

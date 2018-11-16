@@ -7,25 +7,28 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
   state: {
+    newTagValue: '',
     post: {
       postId: 0,
       subject: '',
       content: '',
-      tags: '',
-      postcategoryId: 1
+      tags: [],
+      postCategoryId: 1
     },
     tempFilePaths: [],
     categoryList: []
   },
   mutations: {
+    // 注意更新 post时，把用于标签输入框的值清空
     updatePost: (state, _post) => {
       const obj = state
       obj.post = _post
+      obj.newTagValue = ''
       //
     },
     updateCategoryId: (state, categoryId) => {
       const obj = state
-      obj.post.postcategoryId = categoryId
+      obj.post.postCategoryId = categoryId
     },
     updatePostSubject: (state, _postSubject) => {
       const obj = state
@@ -46,6 +49,10 @@ const store = new Vuex.Store({
     updatetempFilePaths: (state, newValue) => {
       const obj = state
       obj.tempFilePaths = newValue
+    },
+    updatenewTagValue: (state, newValue) => {
+      const obj = state
+      obj.newTagValue = newValue
     }
   }
 })

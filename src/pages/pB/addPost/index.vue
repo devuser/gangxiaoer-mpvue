@@ -45,7 +45,13 @@
             <div>
                 <Label>标签</Label>
                 <!-- <input key="post-postTags-alias" :value="post.tags" v-model="postTags" @change="onChangeSubject" /> -->
-                <van-field :border="true" :value="tagsMerged" id="post-tags-alias" placeholder="请输入逗号分隔的标签" @change="onChangeTags($event)" :key="post-tags" />
+                <van-field :border="true" :value = "newTagValue" id="post-tags-alias" placeholder="请输入新标签" @change="onChangeNewTagValue($event)" :key="post-tags" />
+                <van-button size="small" @click="onAddTag($event)">添加</van-button>
+                <block v-for="(tag, tagIndex) in post.tags" :key="tagIndex">
+                  <van-tag class="demo-margin-right" round :id="tag.id"
+                  :type="tag.tagType"
+                  > {{ tag.Tag }} </van-tag>
+                </block>
             </div>
         </van-panel>
         <!--
@@ -82,16 +88,16 @@
         :key="post-tags"
       /> -->
         <van-panel title="分类">
-          <!-- <van-button>{{pickedpostcategoryId}}</van-button> -->
-            <van-radio-group :value= "pickedpostcategoryId" >
+          <!-- <van-button>{{pickedpostCategoryId}}</van-button> -->
+            <van-radio-group :value= "pickedpostCategoryId" >
                 <van-cell-group>
-                    <block v-for="(category,postcategoryId) in categoryList" :key="postcategoryId">
+                    <block v-for="(category,postCategoryId) in categoryList" :key="postCategoryId">
                         <van-cell  @click="onCategoryCellClick($event, category.id)" :key="'<van_cell_'+category.id" :id="'category_cell_'+category.id"  :title="category.categorycn" clickable :data-name="category.id">
                             <label class="radio" :key="category.id">
-                              <!-- <van-button>{{category.id.type}}:{{pickedpostcategoryId.type}}</van-button>
-                              <van-button>{{(category.id+'') === (pickedpostcategoryId+'')}}</van-button> -->
-                                <block v-if="(category.id+'') === (pickedpostcategoryId+'')">
-                                  <van-radio :value = "pickedpostcategoryId+''" :id="'category_radio_'+category.id" :name="category.id+''" :@change="onRadioChange"/> {{category.categorycn}}
+                              <!-- <van-button>{{category.id.type}}:{{pickedpostCategoryId.type}}</van-button>
+                              <van-button>{{(category.id+'') === (pickedpostCategoryId+'')}}</van-button> -->
+                                <block v-if="(category.id+'') === (pickedpostCategoryId+'')">
+                                  <van-radio :value = "pickedpostCategoryId+''" :id="'category_radio_'+category.id" :name="category.id+''" :@change="onRadioChange"/> {{category.categorycn}}
                                 </block>
                                 <block v-else>
                                   <van-radio :id="'category_radio_'+category.id" :name="category.id+''" :@change="onRadioChange"/> {{category.categorycn}}
@@ -101,9 +107,9 @@
                     </block>
                 </van-cell-group>
             </van-radio-group>
-            <!-- <van-radio-group @model  = "pickedpostcategoryId">
-              <block v-for="(category, postcategoryId) in categoryList" :key="postcategoryId">
-                <van-radio :name="category.id"  :id="'sample_'+postcategoryId">单选框 {{postcategoryId}}</van-radio>
+            <!-- <van-radio-group @model  = "pickedpostCategoryId">
+              <block v-for="(category, postCategoryId) in categoryList" :key="postCategoryId">
+                <van-radio :name="category.id"  :id="'sample_'+postCategoryId">单选框 {{postCategoryId}}</van-radio>
               </block>
 
             </van-radio-group> -->
@@ -125,6 +131,7 @@
 
 <script>
 // import 'weui/dist/style/weui.css'
+
 import {
   formatTime
 }
@@ -137,18 +144,19 @@ export default {
   components: {
     card
     // wxParse
+    // BannerSwiper
   },
   data () {
     return {
       logs: [],
-      post: store.state.post,
-      pickedpostcategoryId: '1'
+
+      pickedpostCategoryId: '1'
       // post: {
       //   postId: 0,
       //   subject: '',
       //   content: '',
       //   tags: '',
-      //   postcategoryId: ''
+      //   postCategoryId: ''
       // }
     }
   },
@@ -164,27 +172,32 @@ export default {
       }
       return store.state.post.content.length
     },
-    // pickedpostcategoryId: {
+    // pickedpostCategoryId: {
     //   get() {
     //     let _post = store.state.post
-    //     // if (_post.postcategoryId === undefined) {
-    //     //   let _postcategoryId = this.$root.$mp.query.postcategoryId
-    //     //   return _postcategoryId
+    //     // if (_post.postCategoryId === undefined) {
+    //     //   let _postCategoryId = this.$root.$mp.query.postCategoryId
+    //     //   return _postCategoryId
     //     // } else {
-    //     //   console.log(`store.state.post.postcategoryId: ${_post.postcategoryId}`)
-    //     return _post.postcategoryId
+    //     //   console.log(`store.state.post.postCategoryId: ${_post.postCategoryId}`)
+    //     return _post.postCategoryId
     //     // }
     //   },
     //   set(newValue) {
     //     // let _post = store.state.post
-    //     console.log(`pickedpostcategoryId set ${newValue}`)
+    //     console.log(`pickedpostCategoryId set ${newValue}`)
     //     console.log(newValue)
-    //     // _post.postcategoryId = newValue
+    //     // _post.postCategoryId = newValue
     //     store.commit('updateCategoryId', newValue)
     //   }
     // },
     bNewPost () {
       return (store.state.post.postId === 0)
+    },
+    newTagValue: {
+      get () {
+        return store.state.newTagValue
+      }
     },
     post: {
       get () {
@@ -194,28 +207,38 @@ export default {
         store.commit('updatePost', newValue)
       }
     },
-    tagsMerged: {
-      get () {
-        let _tags = []
-        store.state.post.tags.forEach((tag) => {
-          _tags.push(tag.tag)
-        })
-        return _tags.join(';')
-      }
-    },
     categoryList () {
       return store.state.categoryList
     }
   },
   methods: {
+    onChangeNewTagValue (event) {
+      let _newTagValue = event.mp.detail
+      store.commit('updatenewTagValue', _newTagValue)
+    },
+    onAddTag (event) {
+      console.log(event)
+      console.log(`onChangeTags:${event.mp.detail}`)
+
+      let _tags = this.post.tags
+      let newTag = {'id': _tags.length + 1,
+        'Tag': this.newTagValue,
+        'tagType': this.$randomTagType()}
+      _tags.push(newTag)
+      let _post = this.post
+      _post.tags = _tags
+      console.log(_post)
+      console.log(_tags)
+      store.commit('updatePost', _post)
+    },
     // onRadioChange(event) {
     //   console.log(event)
     //   console.log(event.id)
     //
-    //   let postcategoryId = event.mp.detail.Number
-    //   console.log(`onRadioChange:${postcategoryId}`)
+    //   let postCategoryId = event.mp.detail.Number
+    //   console.log(`onRadioChange:${postCategoryId}`)
     //   let _post = this.post
-    //   _post.postcategoryId = postcategoryId
+    //   _post.postCategoryId = postCategoryId
     //   console.log(`_post:${_post}`)
     //   console.log(_post)
     //   store.commit('updatePost', _post)
@@ -258,16 +281,16 @@ export default {
       console.log('onCategoryCellClick')
       console.log(id)
       console.log(event)
-      this.pickedpostcategoryId = id
+      this.pickedpostCategoryId = id
       store.commit('updateCategoryId', id)
     },
     onChangeCategory (event) {
       console.log(`onChangeCategory:${event.mp.detail}`)
       console.log(event)
-      let _postcategoryId = event.mp.detail
+      let _postCategoryId = event.mp.detail
       let _post = this.post
-      this.pickedpostcategoryId = event.mp.detail
-      _post.postcategoryId = _postcategoryId
+      this.pickedpostCategoryId = event.mp.detail
+      _post.postCategoryId = _postCategoryId
 
       console.log(_post)
       store.commit('updatePost', _post)
@@ -294,10 +317,10 @@ export default {
       store.commit('updatecategoryList', categoryList)
     },
     // updateCategoryByPost(_post) {
-    //   // let _postcategoryId = _post.postcategoryId
+    //   // let _postCategoryId = _post.postCategoryId
     //   // let _categoryList = []
     //   // store.state.categoryList.forEach((category) => {
-    //   //   if (category.id === _postcategoryId) {
+    //   //   if (category.id === _postCategoryId) {
     //   //     category.checked = true
     //   //   } else {
     //   //     category.checked = false
@@ -310,21 +333,21 @@ export default {
     //   let _post = this.post
     //   _post.subject = this.postSubject
     //   _post.content = this.postContent
-    //   _post.postcategoryId = this.postcategoryId
+    //   _post.postCategoryId = this.postCategoryId
     //   _post.tags = this.postTags
     //   console.log(_post)
     //   store.commit('updatePost', _post)
     // },
-    // onClick(_postcategoryId) {
+    // onClick(_postCategoryId) {
     //   let _post = this.post
-    //   _post.postcategoryId = this.postcategoryId
+    //   _post.postCategoryId = this.postCategoryId
     //   console.log(_post)
     // },
     onChangeSubject (event, action) {
       // let _post = this.post
       // // _post.subject = this.postSubject
       // // _post.content = this.postContent
-      // // _post.postcategoryId = this.postcategoryId
+      // // _post.postCategoryId = this.postCategoryId
       // // _post.tags = this.postTags
       // console.log(_post)
       // // this.post = _post
@@ -334,6 +357,13 @@ export default {
     },
     onSubmit () {
       // let that = this
+      const mergedTags = (tags) => {
+        let tagNames = []
+        tags.forEach((tag) => {
+          tagNames.push(tag.Tag)
+        })
+        return tagNames.join(';')
+      }
       let _post = this.post
       console.log(_post)
       let token = wx.getStorageSync('token')
@@ -342,13 +372,15 @@ export default {
         return
       }
       console.log(`token:${token}`)
+      let tagListStr = mergedTags(_post.tags)
+      console.log(`tagListStr:${tagListStr}`)
       let body = {
         'token': token,
         'id': _post.postId,
-        'postcategoryId': parseInt(_post.postcategoryId),
+        'postCategoryId': parseInt(_post.postCategoryId),
         'subject': _post.subject,
         'content': _post.content,
-        'tags': _post.tags,
+        'tags': tagListStr,
         'mainimage': '',
         'auximages': '',
         'dateAdd': '',
@@ -362,20 +394,25 @@ export default {
       }).then((res) => {
         console.log(res)
         // console.log(res.code)
-        let postId = res.data
+        let postId = res.data.postId
+        let tagIdList = res.data.tagIdList
+        console.log(`postId: ${postId}`)
+        console.log(`tagIdList: ${tagIdList}`)
+
         // console.log(res.data.msg)
         // 循环提交每个图片文件，注意携带 postId
         let imageFiles = wx.getStorageSync('add-post-images')
         for (var imageFileIndex in imageFiles) {
           let imageFile = imageFiles[imageFileIndex]
           console.log('imageFile: ' + imageFile)
+          console.log('postId: ' + postId)
           let token = wx.getStorageSync('token')
           if (token === '') {
             this.$getOpenid()
             return
           }
           wx.uploadFile({
-            url: this.$http.config.baseURL + 'upload',
+            url: this.$http.config.baseURL + '/auximage/upload',
             filePath: imageFile,
             name: 'upload[]',
             formData: {
@@ -424,10 +461,10 @@ export default {
       // store.commit('updatePost', _post)
     },
     async onGetPostData () {
-      let _postcategoryId = this.$root.$mp.query.postcategoryId
+      let _postCategoryId = this.$root.$mp.query.postCategoryId
       let _postId = this.$root.$mp.query.postId
       console.log(`onGetPostData_postId: ${_postId}`)
-      console.log(`onGetPostData_postcategoryId: ${_postcategoryId}`)
+      console.log(`onGetPostData_postCategoryId: ${_postCategoryId}`)
       let token = wx.getStorageSync('token')
       if (token === '') {
         this.$getOpenid()
@@ -451,52 +488,55 @@ export default {
       store.commit('updatePost', _post)
       // this.updateCategoryByPost(_post)
     },
-    initPost (_postcategoryId) {
+    initPost (_postCategoryId) {
       let _post = this.post
+      _post.subject = ''
+      _post.content = ''
       _post.postId = 0
-      _post.postcategoryId = _postcategoryId
-      _post.tags = ''
-      console.log(`param _postcategoryId: ${_postcategoryId}`)
+      _post.postCategoryId = _postCategoryId
+      _post.tags = []
+      console.log(`param _postCategoryId: ${_postCategoryId}`)
       store.commit('updatePost', _post)
       // this.updateCategoryByPost(_post)
     }
   },
-  onShow () {
+  onLoad () {
     //
     // let _that = this
     console.log('onshow')
-    // this.pickedpostcategoryId = this.$root.$mp.query.postcategoryId
-    let _postcategoryId = this.$root.$mp.query.postcategoryId
-    console.log(`param _postcategoryId: ${_postcategoryId}`)
+    // this.pickedpostCategoryId = this.$root.$mp.query.postCategoryId
+    let _postCategoryId = this.$root.$mp.query.postCategoryId
+    console.log(`param _postCategoryId: ${_postCategoryId}`)
     let _postId = this.$root.$mp.query.postId
     console.log(`param _postId: ${_postId}`)
     if (_postId === '0') {
-      this.getCategoryData()
-
-      //
-      // console.log(res)
-      console.log('call initPost with ' + _postcategoryId)
-      this.initPost(_postcategoryId)
-      // store.commit('updateCategoryId', _postcategoryId)
-      console.log('update pickedpostcategoryId with ' + _postcategoryId)
-      this.pickedpostcategoryId = _postcategoryId
+      this.getCategoryData().then((res) => {
+        //
+        console.log(res)
+        console.log('call initPost with ' + _postCategoryId)
+        this.initPost(_postCategoryId)
+        // store.commit('updateCategoryId', _postCategoryId)
+        console.log('update pickedpostCategoryId with ' + _postCategoryId)
+        this.pickedpostCategoryId = _postCategoryId
+      })
     } else {
-      this.getCategoryData()
-      // console.log('results:', resultList)
-      this.onGetPostData()
-      let _post = store.post
-      _post.postcategoryId = _postcategoryId
-      this.pickedpostcategoryId = _postcategoryId
-      store.commit('updatePost', _post)
-      console.log('update pickedpostcategoryId with ' + _postcategoryId)
-      // store.commit('updateCategoryId', _postcategoryId)
-      this.pickedpostcategoryId = _postcategoryId
+      this.getCategoryData().then((res) => {
+        // console.log('results:', resultList)
+        this.onGetPostData()
+        let _post = store.post
+        _post.postCategoryId = _postCategoryId
+        this.pickedpostCategoryId = _postCategoryId
+        store.commit('updatePost', _post)
+        console.log('update pickedpostCategoryId with ' + _postCategoryId)
+        // store.commit('updateCategoryId', _postCategoryId)
+        this.pickedpostCategoryId = _postCategoryId
+      })
     }
   },
-  onLoad () {
-    //
-
-  },
+  // onLoad () {
+  //   //
+  //
+  // },
   created () {
     const logs = (wx.getStorageSync('logs') || [])
     this.logs = logs.map(log => formatTime(new Date(log)))

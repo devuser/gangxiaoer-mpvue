@@ -14,11 +14,13 @@ import {
   from '@/utils/request'
 import {
   getOpenid,
-  registerUser
+  registerUser,
+  randomTagType,
+  beautifyPostList
 }
   from '@/utils/api'
 import App from './App'
-
+import Hack from '@/utils/Hack'
 // 全局处理重复页面跳转详情初始化,和详情跳详情返回的bug
 import MyPlugin from './minxins'
 Vue.use(MyPlugin)
@@ -37,14 +39,18 @@ Vue.prototype.$registerUser = registerUser
 Vue.prototype.$getMyselfAddrList = getMyselfAddrList
 Vue.prototype.$getTagList = getTagList
 Vue.prototype.$doSignIn = doSignIn
+Vue.prototype.$randomTagType = randomTagType
 Vue.prototype.$globalData = {
   pagelen: 10
 }
+
+Vue.prototype.$beautifyPostList = beautifyPostList
+
 var bus = new Vue()
 Vue.prototype.$bus = bus
 Vue.config.productionTip = false
 App.mpType = 'app'
-
+Vue.use(Hack)
 const app = new Vue(App)
 app.$mount()
 // "pages": [

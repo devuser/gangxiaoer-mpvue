@@ -2,7 +2,10 @@
 
 <template>
 
-<van-card num="2" tag="标签" price="2.00" :desc="post.content" :title="post.subject" :thumb="post.mainimage" @click="onViewPostDetail(post.id)">
+
+  <van-card num="2" :tag="post.cardTag" price="2.00" :desc="post.content" :title="post.subject" :thumb="post.mainimage" @click="onViewPostDetail(post.id)">
+
+
     <view slot="footer">
         <!-- <div class="post-dateAdd">{{post.dateAdd}}</div>
 <div class="post-favcount">收藏{{post.favcount}}</div>
@@ -36,8 +39,13 @@ export default {
   methods: {
     onViewPostDetail (postId) {
       console.log(postId)
+      let param = {
+        channel: 'wxappShare',
+        shareToken: '',
+        postId: postId
+      }
       wx.navigateTo({
-        url: '/pages/pC/viewPost/main?postId=' + postId
+        url: '/pages/viewPost/main?rq=' + encodeURIComponent(JSON.stringify(param))
       })
     },
     async onHandActionPost (postId, handAction) {
@@ -45,50 +53,48 @@ export default {
       console.log('before getData')
       console.log(handAction)
       console.log(this.$http)
-      const res = await this.$http.request({
-        method: 'get',
-        url: `/post/${handAction}`,
-        body: {
-          'token': '',
+      let token = wx.getStorageSync('token')
+      if (token === '') {
+        this.$getOpenid()
+        return
+      }
+      this.$post(`/post/${handAction}`,
+        {
+          'token': token,
           'postId': postId
         }
-      })
-      console.log(res)
-      console.log(res.code)
-      console.log(res.data)
-      // store.commit('updatePost', res.data)
+      ).then((res) => { console.log(res) })
     },
 
     async onDoFavPost (postId) {
       console.log(postId)
       console.log('before getData')
       console.log(this.$http)
-      const res = await this.$http.request({
-        method: 'get',
-        url: '/post/fav',
-        body: {
-          'token': '',
+      let token = wx.getStorageSync('token')
+      if (token === '') {
+        this.$getOpenid()
+        return
+      }
+      this.$post(`/post/fav`,
+        {
+          'token': token,
           'postId': postId
         }
-      })
-      console.log(res)
-      console.log(res.code)
-      console.log(res.data)
+      ).then((res) => { console.log(res) })
     },
     async onHidePost (postId) {
       console.log(postId)
-
-      const res = await this.$http.request({
-        method: 'get',
-        url: '/post/hide',
-        body: {
-          'token': '',
+      let token = wx.getStorageSync('token')
+      if (token === '') {
+        this.$getOpenid()
+        return
+      }
+      this.$post(`/post/hide`,
+        {
+          'token': token,
           'postId': postId
         }
-      })
-      console.log(res)
-      console.log(res.code)
-      console.log(res.data)
+      ).then((res) => { console.log(res) })
     }
   }
 }

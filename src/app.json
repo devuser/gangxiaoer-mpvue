@@ -3,7 +3,8 @@
     "pages/index/main",
     "pages/cart/main",
     "pages/dashboard/main",
-    "pages/my/main"
+    "pages/my/main",
+    "pages/viewPost/main"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -16,58 +17,49 @@
     "borderStyle": "white",
     "selectedColor": "#b4282d",
     "color": "#666",
-    "list": [
-      {
-        "pagePath": "pages/index/main",
-        "text": "首页",
-        "iconPath": "static/images/ic_menu_choice_nor.png",
-        "selectedIconPath": "static/images/ic_menu_choice_pressed.png"
-      },
-      {
-        "pagePath": "pages/dashboard/main",
-        "text": "看板",
-        "iconPath": "static/images/ic_menu_sort_nor.png",
-        "selectedIconPath": "static/images/ic_menu_sort_pressed.png"
-      },
-      {
-        "pagePath": "pages/cart/main",
-        "iconPath": "static/images/ic_menu_shoping_nor.png",
-        "selectedIconPath": "static/images/ic_menu_shoping_pressed.png",
-        "text": "购物车"
-      },
-      {
-        "pagePath": "pages/my/main",
-        "text": "我的",
-        "iconPath": "static/images/ic_menu_me_nor.png",
-        "selectedIconPath": "static/images/ic_menu_me_pressed.png"
-      }
-    ]
+    "list": [{
+      "pagePath": "pages/index/main",
+      "text": "首页",
+      "iconPath": "static/images/ic_menu_choice_nor.png",
+      "selectedIconPath": "static/images/ic_menu_choice_pressed.png"
+    }, {
+      "pagePath": "pages/dashboard/main",
+      "text": "看板",
+      "iconPath": "static/images/ic_menu_sort_nor.png",
+      "selectedIconPath": "static/images/ic_menu_sort_pressed.png"
+    }, {
+      "pagePath": "pages/cart/main",
+      "iconPath": "static/images/ic_menu_shoping_nor.png",
+      "selectedIconPath": "static/images/ic_menu_shoping_pressed.png",
+      "text": "购物车"
+    }, {
+      "pagePath": "pages/my/main",
+      "text": "我的",
+      "iconPath": "static/images/ic_menu_me_nor.png",
+      "selectedIconPath": "static/images/ic_menu_me_pressed.png"
+    }]
   },
-  "subPackages": [
-    {
-      "root": "pages/pA",
-      "pages": [
-        "logs/main",
-        "viewAddrList/main",
-        "addSuggestion/main",
-        "editAddr/main",
-        "counter/main"
-      ]
-    },
-    {
-      "root": "pages/pB",
-      "pages": [
-        "addPost/main",
-        "myPost/main",
-        "topic/main"
-      ]
-    },
-    {
-      "root": "pages/pC",
-      "pages": [
-        "login/main",
-        "viewPost/main"
-      ]
-    }
-  ]
+  "subPackages": [{
+    "root": "pages/pA",
+    "pages": [
+      "logs/main",
+      "viewAddrList/main",
+      "addSuggestion/main",
+      "editAddr/main",
+      "counter/main"
+    ]
+  }, {
+    "root": "pages/pB",
+    "pages": [
+      "addPost/main",
+      "myPost/main",
+      "topic/main"
+    ]
+  }, {
+    "root": "pages/pC",
+    "pages": [
+      "login/main",
+      "searchPost/main"
+    ]
+  }]
 }

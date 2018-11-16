@@ -1,55 +1,22 @@
-
 <template>
-
-<!-- @click="clickHandle('test click', $event)" -->
 <div class="index" >
-    <!-- 新增代码开始 -->
-    <!-- <view class="swiper-container">
-     <swiper class="swiper_box"
-                 autoplay="{{autoplay}}" interval="{{interval}}" duration="{{duration}}" @bindchange="swiperchange">
-         <block wx:for="{{banners}}" wx:key="id">
-             <swiper-item>
-                 <image bindtap="tapBanner" data-id="{{item.businessId}}" src="{{item.picUrl}}_m" class="slide-image" width="750rpx" height="562.5rpx"/>
-             </swiper-item>
-         </block>
-     </swiper>
-     <view class="dots">
-         <block wx:for="{{banners}}" wx:key="unique">
-             <view class="dot{{index == swiperCurrent ? ' active' : ''}}"></view>
-         </block>
-     </view>
-</view> -->
-    <!-- <div class="swiper">
-        <ul>
-            <li v-for="(item, itemIndex) in banner" :key="itemIndex">
-                {{item.image_url}}
-            </li>
-        </ul>
-    </div> -->
-    <!-- <div>
-        Banner 本地模式
-    </div> -->
-    <!-- <div class="swiper">
-      <swiper class="swiper-container" indicator-dots="true" autoplay="true" interval="3000" circular="true" duration="500">
-        <block v-for="(item, index) in banner " :key="index">
-          <swiper-item class="swiper-item">
-            <image :src="item.image_url" class="slide-image" />
-          </swiper-item>
-        </block>
-      </swiper>
-    </div> -->
-    <!-- <div>
-        Banner 组件模式开始
-    </div> -->
-    <div class="search">
-      <div @click="toMappage">
-        {{cityName}}
-      </div>
-      <div @click="toSearch">
-        <input type="text" placeholder="搜索帖子">
-        <span class="icon"></span>
-      </div>
-    </div>
+
+    <van-row>
+      <van-col span="4">
+            {{cityName}}
+
+    </van-col>
+    <van-col  span="16">
+
+        <input type="text" :value="keyword" placeholder="搜索帖子" @change="onChangeKeyword($event)">
+
+
+      </van-col>
+      <van-col  span="4">
+        <van-button size="small" type="primary" @click="toSearch($event)">搜索
+        </van-button>
+      </van-col>
+    </van-row>
 
     <BannerSwiper :images="banner" />
 
@@ -82,11 +49,9 @@
 
         </swiper>
     </div> -->
-    <van-tabs :active="active" @change="onChange">
-    <block v-for="(categoryItem, categoryIndex) in categoryList" :key="categoryIndex">
-
-      <van-tab :title="categoryItem.categorycn" :id="categoryItem.id" >
-
+    <van-tabs :active="activeTabIndex" @change="onChange">
+      <block v-for="(category, categoryIndex) in categoryList" :key="categoryIndex">
+      <van-tab :title="category.categorycn" :id="category.categoryId" >
         <PostButtonArea :bShowPostButton="bShowPostButton" :toporbottom="'top'" />
         <div>
         <block v-for="(item, index) in postList" :key="index">
@@ -96,7 +61,7 @@
           <PostButtonArea :bShowPostButton="bShowPostButton" :toporbottom="'bottom'" />
       </van-tab>
     </block>
-</van-tabs>
+    </van-tabs>
 
 
 <van-cell-group>
@@ -141,12 +106,13 @@ export default {
       a: 1,
       // motto: 'Hello World',
       currentTab: 0,
-      pageindex: 1,
-      pagelen: 20,
-      pagecount: 0,
       categoryList: [],
-
-      postMap: new Map(),
+      // postMap: new Map([
+      //   ['1', []],
+      //   ['2', []],
+      //   ['3', []],
+      //   ['4', []]
+      // ]),
       // tabBar: [{
       //   'title': '本周最热A'
       // }, {
@@ -167,33 +133,63 @@ export default {
     PostButtonArea
   },
   computed: {
-    active () {
-      return store.state.active
+    cityName: {
+      get () {
+        return store.state.cityName
+      }
+    },
+    keyword: {
+      get () {
+        return store.state.keyword
+      }
+    },
+    activeTabId: {
+      get () {
+        return store.state.currentCategoryId
+      }
+    },
+    currentCategoryId () {
+      return store.state.currentCategoryId
     },
     postList () {
       return store.state.postList
     },
     bShowPostButton () {
-      return (store.state.postList.length > 5)
-    },
-    currentCategoryId () {
-      return store.state.currentCategoryId
+      // return (store.state.postList.length > 5)
+      return true
     },
     userInfo: {
       get () {
         return store.state.userInfo
       }
+    },
+
+    pageindex: {
+      get () {
+        return store.state.pageindex
+      }
+    },
+    pagelen: {
+      get () {
+        return store.state.pagelen
+      }
+    },
+    pagecount: {
+      get () {
+        return store.state.pagecount
+      }
     }
   },
   methods: {
-    // onAddPostEvent(msg) {
-    //   this.$bus.$emit('addPost', msg)
-    // },
+    onChangeKeyword (event) {
+      let _keyword = event.mp.detail.value
+      store.commit('updateKeyword', _keyword)
+    },
     onAddPost (event) {
       console.log(event)
       console.log('onAddPost')
       console.log(`this.currentCategoryId: ${this.currentCategoryId}`)
-      let addPostURL = `/pages/pB/addPost/main?postId=0&postcategoryId=${this.currentCategoryId}`
+      let addPostURL = `/pages/pB/addPost/main?postId=0&postCategoryId=${this.currentCategoryId}`
       console.log(`addPostURL:${addPostURL}`)
       wx.navigateTo({
         url: addPostURL
@@ -201,33 +197,24 @@ export default {
     },
     onChange (event) {
       console.log(event)
-      let _postcategoryId = event.target.index + 1
+      let _activeTabIndex = event.target.index
+      let _postCategoryId = event.target.index + 1
       let _postcategoryName = event.mp.detail.title
       wx.showToast({
         title: `切换到标签 ${_postcategoryName}`,
         icon: 'none'
       })
       let token = wx.getStorageSync('token')
+      if (token === '') {
+        this.$getOpenid()
+        return
+      }
       let _pageindex = this.pageindex
       let _pagelen = this.pagelen
-      this.$getPostList(token, _postcategoryId, _pageindex, _pagelen).then((res) => {
-        // console.log('getPostList:' + res)
-        // console.log(res)
-        // console.log(res.data.data)
-        // console.log(res.data.pagelen)
-        this.pagelen = res.data.pagelen
-        this.pageindex = res.data.pageindex
-        this.pagecount = res.data.pagecount
-        let _data = res.data.data
-        console.log(`${this.pagelen}-${this.pageindex}-${this.pagecount}`)
-        let _postList = []
-        _data.forEach((itm) => { _postList.push(itm) })
-        console.log('_postList')
-        console.log(_postList)
-        store.commit('updatePostList', _postList)
-
-        store.commit('changeActive', event.target.index)
-        store.commit('updateCurrentCategoryId', _postcategoryId)
+      store.commit('updateactiveTabIndex', _activeTabIndex)
+      store.commit('updateCurrentCategoryId', _postCategoryId)
+      this.$getPostList(token, _postCategoryId, _pageindex, _pagelen).then((res) => {
+        this.onGetPostSuccess(res)
         wx.hideToast()
       })
     },
@@ -276,7 +263,7 @@ export default {
     //   // weui.alert('alert')
     // },
     async getBanner () {
-      console.log('before getData')
+      console.log('before getBanner')
       console.log(this.$http)
       const res = await this.$http.request({
         method: 'get',
@@ -305,7 +292,7 @@ export default {
       // console.log(bannerList)
       // console.log(bannerList.code)
     },
-    // async getPostList (postcategoryId) {
+    // async getPostList (postCategoryId) {
     //   console.log('before getData')
     //   console.log(this.$http)
     //   let token = wx.getStorageSync('token')
@@ -314,7 +301,7 @@ export default {
     //     url: '/post/list',
     //     body: {
     //       'token': token,
-    //       'postcategoryId': postcategoryId,
+    //       'postCategoryId': postCategoryId,
     //       'pageindex': this.pageindex,
     //       'pagelen': this.pagelen
     //     }
@@ -343,39 +330,33 @@ export default {
         body: {
         }
       })
+      console.log(postcategoryListRes.data)
       this.categoryList = null
       this.categoryList = postcategoryListRes.data
       console.log('postcategoryList:' + this.categoryList)
       console.log(this.categoryList)
-      let _postcategoryId = 1
+      let _categoryList = []
+      postcategoryListRes.data.forEach((category) => {
+        let foo = {'postCategoryId': category.id, 'categorycn': category.categorycn}
+        _categoryList.push(foo)
+      })
+      wx.setStorageSync('categoryList', JSON.stringify(_categoryList))
+      let _postCategoryId = 1
       let token = wx.getStorageSync('token')
       let _pageindex = 1
       let _pagelen = this.$globalData.pagelen ? this.$globalData.pagelen : 10
-      this.$getPostList(token, _postcategoryId, _pageindex, _pagelen).then((res) => {
-        // let { _data, pagelen, pageindex, pagecount } = res.data.data
-        console.log('getPostList:' + res)
-        console.log(res)
-        console.log(res.data.data)
-        console.log(res.data.pagelen)
-        this.pagelen = res.data.pagelen
-        this.pageindex = res.data.pageindex
-        this.pagecount = res.data.pagecount
-        let _data = res.data.data
-        console.log(`${this.pagelen}-${this.pageindex}-${this.pagecount}`)
-        let _postList = []
-        _data.forEach((itm) => { _postList.push(itm) })
-        console.log('_postList')
-        console.log(_postList)
-        store.commit('updatePostList', _postList)
+      store.commit('updateCurrentCategoryId', _postCategoryId)
+      this.$getPostList(token, _postCategoryId, _pageindex, _pagelen).then((res) => {
+        this.onGetPostSuccess(res)
       })
 
       // // let postMap = new Map()
       // let subfuncList = []
       // this.categoryList.forEach(postcategory => {
-      //   const postcategoryId = postcategory.id
+      //   const postCategoryId = postcategory.id
       //   const subFunc = () => {
-      //     let postList = await this.getPostList(postcategoryId)
-      //     return { 'postList': postList, 'postcategoryId': postcategoryId }
+      //     let postList = await this.getPostList(postCategoryId)
+      //     return { 'postList': postList, 'postCategoryId': postCategoryId }
       //   }
       //   subfuncList.push(subFunc)
       // })
@@ -388,16 +369,117 @@ export default {
 
       //
       // this.categoryList.forEach(function(postcategory) {
-      //   const postcategoryId = postcategory.id
-      //   this.getPostList(postcategoryId).then(function(result) {
+      //   const postCategoryId = postcategory.id
+      //   this.getPostList(postCategoryId).then(function(result) {
       //     console.log('result: ' + result)
-      //     this.postMap.set(postcategoryId, result)
+      //     this.postMap.set(postCategoryId, result)
       //
-      //     console.log(this.postMap.get(postcategoryId).postList)
+      //     console.log(this.postMap.get(postCategoryId).postList)
       //   })
       // })
+    },
+    onGetPostSuccess (res) {
+      // let { _data, pagelen, pageindex, pagecount } = res.data.data
+      console.log('getPostList:' + res)
+      console.log(res)
+      console.log(res.data.data)
+      console.log(res.data.pagelen)
+      let pagelen = res.data.pagelen
+      let pageindex = res.data.pageindex
+      let pagecount = res.data.pagecount
+      let _data = res.data.data
+      //   console.log(`${this.pagelen}-${this.pageindex}-${this.pagecount}`)
+      let _postList = this.$beautifyPostList(_data)
+      console.log('_postList')
+      //   console.log(_postList)
+      let pagenav = JSON.stringify({'postCategoryId': this.currentCategoryId, 'pageindex': pageindex, 'pagecount': pagecount, 'pagelen': pagelen})
+      wx.setStorageSync('pagenav', pagenav)
+      store.commit('updatePostList', _postList, pageindex, pagecount, pagelen)
+    },
+    // @todo: 如下增量下来数据的逻辑，有待优化
+    // 超过1024后，使用翻页机制
+    getPagenav () {
+      const cstDefaultPagenav = '{"postCategoryId":1,"pageindex":1,"pagecount":1,"pagelen":10}'
+      const cstMaxPageLen = 1024
+      let strPagenav = wx.getStorageSync('pagenav')
+      if (strPagenav === '') {
+        strPagenav = cstDefaultPagenav
+      }
+      // @todo: 如下增量下来数据的逻辑，有待优化
+      // 超过1024后，使用翻页机制
+      let pagenav = JSON.parse(strPagenav)
+      let _pagelen = pagenav.pagelen + 5
+      let _pageindex = pagenav.pageindex
+      if (_pagelen > cstMaxPageLen) {
+        _pagelen = pagenav.pagelen
+        _pageindex = pagenav.pageindex + 1
+      }
+      let _postCategoryId = pagenav.postCategoryId
+      console.log(`_postCategoryId:_pagelen:_pageindex:${_postCategoryId}:${_pagelen}:${_pageindex}`)
+      return {'postCategoryId': _postCategoryId, 'pageindex': _pageindex, 'pagecount': 1, 'pagelen': _pagelen}
+    },
+    // 支持 上拉刷新，下拉刷新
+    _getRegisterInfo () {
+      let _that = this
+      let token = wx.getStorageSync('token')
+      if (token === '') {
+        this.$getOpenid()
+        return
+      }
+      if (_that.pageindex >= _that.pagecount) {
+        wx.showToast('已经到末尾')
+        return
+      }
+      let pagenav = this.getPagenav()
+      wx.showLoading({
+        title: '玩命加载中'
+      })
+
+      this.$getPostList(token, pagenav.postCategoryId, pagenav.pageindex, pagenav.pagelen).then((res) => {
+        this.onGetPostSuccess(res)
+        wx.hideLoading()
+      })
+    },
+    // end of _getRegisterInfo
+    toSearch (event) {
+      console.log(event)
+      console.log(this.keyword)
+      let _keyword = this.keyword
+      if (_keyword === '') {
+        wx.showToast({
+          title: `请输入您要查询的关键词`,
+          icon: 'none'
+        })
+        return
+      }
+      let token = wx.getStorageSync('token')
+      if (token === '') {
+        this.$getOpenid()
+        return
+      }
+      let targetURL = '/pages/pC/searchPost/main?keyword=' + _keyword
+      wx.navigateTo({
+        url: targetURL
+      })
     }
-  },
+    // end of function toSearch
+
+  }, // end of methods
+
+  // 后台接口可忽略
+  // get('/os-wx-bee/sso/getRegisterInfo.html?pageNum=' + pageNum + '&pageSize=' + pageSize, {}).then(res => {
+  //   if (res.code === 0) {
+  //     if (res.data.listPartner.length) {
+  //       this.sellerList.push(...res.data.listPartner)
+  //     } else {
+  //
+  //     }
+  //     wx.hideLoading()
+  //   }
+  // }).catch(err => {
+  //   console.log(err)
+  // })
+  /// /////////////////////////////////////////////////////////////////
   // onShow () {
   //   // `this` 指向 vm 实例
   //   console.log('a is: ' + this.a, '小程序触发的 onshow')
@@ -410,7 +492,7 @@ export default {
     MsgBus.$on('add-post', (msg) => {
       console.log(msg)
       console.log(`this.currentCategoryId: ${this.currentCategoryId}`)
-      let addPostURL = `/pages/pB/addPost/main?postId=0&postcategoryId=${this.currentCategoryId}`
+      let addPostURL = `/pages/pB/addPost/main?postId=0&postCategoryId=${this.currentCategoryId}`
       console.log(`addPostURL: ${addPostURL}`)
       wx.navigateTo({
         url: addPostURL
@@ -444,6 +526,19 @@ export default {
       console.log('before getOpenid')
       this.$getOpenid()
     }
+  },
+  // 上拉加载
+  onReachBottom: function () {
+    // 执行上拉执行的功能
+    // let that = this
+    // that.setData({pageindex: that.pageindex + 1})
+    this._getRegisterInfo()
+  },
+  // 停止下拉刷新
+  async onPullDownRefresh () {
+  // to doing..
+  // 停止下拉刷新
+    wx.stopPullDownRefresh()
   }
 }
 </script>
